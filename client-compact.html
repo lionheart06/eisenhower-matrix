@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eisenhower Matrix - Compact</title>
+</head>
+<body>
+    <div id="main"></div>
+    
+    <script type="module">
+        import { DraggableMatrix, QuadrantType } from './dist/index.js';
+        
+        // Initialize compact matrix
+        const compactSize = {
+            width: '600px',
+            quadrantMinHeight: '150px',
+            fontSize: '11px',
+            padding: '10px',
+            taskPadding: '6px',
+            titleSize: '1.2em'
+        };
+        
+        const matrix = new DraggableMatrix('main', undefined, compactSize);
+        
+        // Add some smaller, concise tasks for compact view
+        setTimeout(() => {
+            matrix.addTask('Bug fix', 'Critical error', QuadrantType.URGENT_IMPORTANT);
+            matrix.addTask('Learning', 'Study new tech', QuadrantType.NOT_URGENT_IMPORTANT);
+            matrix.addTask('Email', 'Reply to messages', QuadrantType.URGENT_NOT_IMPORTANT);
+            matrix.addTask('Social', 'Check feeds', QuadrantType.NOT_URGENT_NOT_IMPORTANT);
+        }, 1000);
+    </script>
+</body>
+</html>

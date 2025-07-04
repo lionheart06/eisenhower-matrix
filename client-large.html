@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eisenhower Matrix - Large</title>
+</head>
+<body>
+    <div id="main"></div>
+    
+    <script type="module">
+        import { DraggableMatrix, QuadrantType } from './dist/index.js';
+        
+        // Initialize large matrix
+        const largeSize = {
+            width: '1600px',
+            quadrantMinHeight: '500px',
+            fontSize: '16px',
+            padding: '30px',
+            taskPadding: '20px',
+            titleSize: '3em'
+        };
+        
+        const matrix = new DraggableMatrix('main', undefined, largeSize);
+        
+        // Add comprehensive tasks for large view with detailed descriptions
+        setTimeout(() => {
+            // Urgent & Important
+            matrix.addTask('Production System Outage', 'Critical infrastructure failure affecting 10,000+ users. Database connection pool exhausted. Immediate investigation and resolution required.', QuadrantType.URGENT_IMPORTANT);
+            matrix.addTask('Security Breach Response', 'Potential data breach detected in user authentication system. Need to secure the vulnerability and assess damage scope.', QuadrantType.URGENT_IMPORTANT);
+            
+            // Important but Not Urgent
+            matrix.addTask('Architecture Redesign Planning', 'Plan the migration from monolithic architecture to microservices. Research containerization strategies, evaluate service mesh options, and create implementation roadmap.', QuadrantType.NOT_URGENT_IMPORTANT);
+            matrix.addTask('Team Training Program', 'Develop comprehensive training program for new technologies including Kubernetes, TypeScript, and cloud-native development practices.', QuadrantType.NOT_URGENT_IMPORTANT);
+            matrix.addTask('Performance Optimization', 'Conduct thorough performance analysis of the application. Identify bottlenecks, implement caching strategies, and optimize database queries.', QuadrantType.NOT_URGENT_IMPORTANT);
+            
+            // Urgent but Not Important
+            matrix.addTask('Client Meeting Preparation', 'Prepare presentation slides and demo for tomorrow\'s client meeting. Coordinate with sales team and ensure all technical aspects are covered.', QuadrantType.URGENT_NOT_IMPORTANT);
+            matrix.addTask('Code Review Backlog', 'Review 15 pending pull requests from team members. Provide detailed feedback and ensure coding standards compliance.', QuadrantType.URGENT_NOT_IMPORTANT);
+            
+            // Neither Urgent nor Important
+            matrix.addTask('Office Kitchen Supplies', 'Restock the office kitchen with coffee, snacks, and other supplies. Check inventory and place orders with vendors.', QuadrantType.NOT_URGENT_NOT_IMPORTANT);
+            matrix.addTask('Update Personal LinkedIn', 'Update LinkedIn profile with recent projects and achievements. Connect with new industry contacts from recent conference.', QuadrantType.NOT_URGENT_NOT_IMPORTANT);
+        }, 1500);
+    </script>
+</body>
+</html>

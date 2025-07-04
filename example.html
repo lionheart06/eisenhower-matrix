@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eisenhower Matrix - Draggable Example</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .matrix {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .quadrant {
+            min-height: 300px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            position: relative;
+            background: #fafafa;
+        }
+        
+        .quadrant.drag-over {
+            background-color: #e8f5e8;
+            border-color: #4CAF50;
+        }
+        
+        .quadrant-header {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        .quadrant-strategy {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+        
+        .urgent-important {
+            background: linear-gradient(135deg, #ffebee, #ffcdd2);
+        }
+        
+        .not-urgent-important {
+            background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+        }
+        
+        .urgent-not-important {
+            background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+        }
+        
+        .not-urgent-not-important {
+            background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+        }
+        
+        .task {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: move;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
+        
+        .task:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: translateY(-2px);
+        }
+        
+        .task.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+        
+        .task-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .task-description {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.4;
+        }
+        
+        .task-form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        
+        textarea {
+            resize: vertical;
+            height: 80px;
+        }
+        
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        button:hover {
+            background: #45a049;
+        }
+        
+        .axis-labels {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+        
+        .urgent-label, .important-label {
+            position: absolute;
+            font-weight: bold;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .urgent-label {
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .important-label {
+            left: -80px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-90deg);
+            transform-origin: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Eisenhower Matrix - Draggable Tasks</h1>
+        
+        <div class="task-form">
+            <h3>Add New Task</h3>
+            <div class="form-group">
+                <label for="taskTitle">Title:</label>
+                <input type="text" id="taskTitle" placeholder="Enter task title">
+            </div>
+            <div class="form-group">
+                <label for="taskDescription">Description:</label>
+                <textarea id="taskDescription" placeholder="Enter task description"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="taskQuadrant">Initial Quadrant:</label>
+                <select id="taskQuadrant">
+                    <option value="urgent_important">Do First (Urgent & Important)</option>
+                    <option value="not_urgent_important">Schedule (Important, Not Urgent)</option>
+                    <option value="urgent_not_important">Delegate (Urgent, Not Important)</option>
+                    <option value="not_urgent_not_important">Eliminate (Neither Urgent nor Important)</option>
+                </select>
+            </div>
+            <button onclick="addTask()">Add Task</button>
+        </div>
+        
+        <div class="matrix" style="position: relative;">
+            <div class="axis-labels">
+                <div class="urgent-label">URGENT →</div>
+                <div class="important-label">IMPORTANT ↑</div>
+            </div>
+            
+            <div class="quadrant urgent-important" data-quadrant="urgent_important">
+                <div class="quadrant-header">Do First</div>
+                <div class="quadrant-strategy">Do these tasks immediately</div>
+                <div class="tasks-container"></div>
+            </div>
+            
+            <div class="quadrant not-urgent-important" data-quadrant="not_urgent_important">
+                <div class="quadrant-header">Schedule</div>
+                <div class="quadrant-strategy">Schedule these tasks for later</div>
+                <div class="tasks-container"></div>
+            </div>
+            
+            <div class="quadrant urgent-not-important" data-quadrant="urgent_not_important">
+                <div class="quadrant-header">Delegate</div>
+                <div class="quadrant-strategy">Delegate these tasks if possible</div>
+                <div class="tasks-container"></div>
+            </div>
+            
+            <div class="quadrant not-urgent-not-important" data-quadrant="not_urgent_not_important">
+                <div class="quadrant-header">Eliminate</div>
+                <div class="quadrant-strategy">Eliminate these tasks</div>
+                <div class="tasks-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the EisenhowerMatrix module
+        import { EisenhowerMatrix, QuadrantType } from './dist/index.js';
+        
+        // Storage API Interface
+        class StorageAdapter {
+            async save(data) {
+                throw new Error('save method must be implemented');
+            }
+            
+            async load() {
+                throw new Error('load method must be implemented');
+            }
+        }
+        
+        // localStorage implementation
+        class LocalStorageAdapter extends StorageAdapter {
+            constructor(key = 'eisenhower-matrix') {
+                super();
+                this.key = key;
+            }
+            
+            async save(data) {
+                localStorage.setItem(this.key, JSON.stringify(data));
+            }
+            
+            async load() {
+                const data = localStorage.getItem(this.key);
+                return data ? JSON.parse(data) : null;
+            }
+        }
+        
+        // REST API implementation example
+        class RestApiAdapter extends StorageAdapter {
+            constructor(baseUrl, apiKey = null) {
+                super();
+                this.baseUrl = baseUrl;
+                this.apiKey = apiKey;
+            }
+            
+            async save(data) {
+                const headers = { 'Content-Type': 'application/json' };
+                if (this.apiKey) headers['Authorization'] = `Bearer ${this.apiKey}`;
+                
+                const response = await fetch(`${this.baseUrl}/matrix`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response.ok) throw new Error('Failed to save data');
+                return response.json();
+            }
+            
+            async load() {
+                const headers = {};
+                if (this.apiKey) headers['Authorization'] = `Bearer ${this.apiKey}`;
+                
+                const response = await fetch(`${this.baseUrl}/matrix`, { headers });
+                if (!response.ok) throw new Error('Failed to load data');
+                return response.json();
+            }
+        }
+        
+        // Draggable Matrix Manager
+        class DraggableEisenhowerMatrix {
+            constructor(storageAdapter = new LocalStorageAdapter()) {
+                this.matrix = new EisenhowerMatrix();
+                this.storageAdapter = storageAdapter;
+                this.init();
+                this.loadData();
+            }
+            
+            init() {
+                this.setupDragAndDrop();
+                this.loadSampleTasks();
+            }
+            
+            async loadData() {
+                try {
+                    const data = await this.storageAdapter.load();
+                    if (data && data.tasks) {
+                        this.matrix.clear();
+                        data.tasks.forEach(task => {
+                            this.matrix.addTask(task.title, task.description, task.quadrant, task.id);
+                        });
+                        this.renderMatrix();
+                    }
+                } catch (error) {
+                    console.warn('Failed to load data:', error);
+                }
+            }
+            
+            async saveData() {
+                try {
+                    const data = {
+                        tasks: this.matrix.getAllTasks(),
+                        timestamp: new Date().toISOString()
+                    };
+                    await this.storageAdapter.save(data);
+                } catch (error) {
+                    console.error('Failed to save data:', error);
+                }
+            }
+            
+            setupDragAndDrop() {
+                const quadrants = document.querySelectorAll('.quadrant');
+                
+                quadrants.forEach(quadrant => {
+                    quadrant.addEventListener('dragover', this.handleDragOver.bind(this));
+                    quadrant.addEventListener('drop', this.handleDrop.bind(this));
+                    quadrant.addEventListener('dragleave', this.handleDragLeave.bind(this));
+                });
+            }
+            
+            handleDragOver(e) {
+                e.preventDefault();
+                e.currentTarget.classList.add('drag-over');
+            }
+            
+            handleDragLeave(e) {
+                e.currentTarget.classList.remove('drag-over');
+            }
+            
+            handleDrop(e) {
+                e.preventDefault();
+                const taskId = e.dataTransfer.getData('text/plain');
+                const newQuadrant = e.currentTarget.dataset.quadrant;
+                
+                e.currentTarget.classList.remove('drag-over');
+                
+                this.moveTask(taskId, newQuadrant);
+            }
+            
+            moveTask(taskId, newQuadrant) {
+                const task = this.matrix.updateTask(taskId, { quadrant: newQuadrant });
+                if (task) {
+                    this.renderMatrix();
+                    this.saveData();
+                }
+            }
+            
+            addTask(title, description, quadrant) {
+                const task = this.matrix.addTask(title, description, quadrant);
+                this.renderMatrix();
+                this.saveData();
+                return task;
+            }
+            
+            removeTask(taskId) {
+                if (this.matrix.removeTask(taskId)) {
+                    this.renderMatrix();
+                    this.saveData();
+                }
+            }
+            
+            renderMatrix() {
+                const matrixData = this.matrix.getMatrix();
+                
+                Object.entries(matrixData).forEach(([quadrant, tasks]) => {
+                    const quadrantElement = document.querySelector(`[data-quadrant="${quadrant}"] .tasks-container`);
+                    quadrantElement.innerHTML = '';
+                    
+                    tasks.forEach(task => {
+                        const taskElement = this.createTaskElement(task);
+                        quadrantElement.appendChild(taskElement);
+                    });
+                });
+            }
+            
+            createTaskElement(task) {
+                const taskDiv = document.createElement('div');
+                taskDiv.className = 'task';
+                taskDiv.draggable = true;
+                taskDiv.dataset.taskId = task.id;
+                
+                taskDiv.innerHTML = `
+                    <div class="task-title">${task.title}</div>
+                    <div class="task-description">${task.description || ''}</div>
+                `;
+                
+                taskDiv.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', task.id);
+                    taskDiv.classList.add('dragging');
+                });
+                
+                taskDiv.addEventListener('dragend', () => {
+                    taskDiv.classList.remove('dragging');
+                });
+                
+                taskDiv.addEventListener('dblclick', () => {
+                    if (confirm('Remove this task?')) {
+                        this.removeTask(task.id);
+                    }
+                });
+                
+                return taskDiv;
+            }
+            
+            loadSampleTasks() {
+                if (this.matrix.getTaskCount() === 0) {
+                    this.matrix.addTask('Fix production bug', 'Critical system error affecting all users', 'urgent_important');
+                    this.matrix.addTask('Plan quarterly goals', 'Set strategic objectives for next quarter', 'not_urgent_important');
+                    this.matrix.addTask('Respond to emails', 'Answer routine correspondence', 'urgent_not_important');
+                    this.matrix.addTask('Browse social media', 'Check latest posts and updates', 'not_urgent_not_important');
+                    this.renderMatrix();
+                }
+            }
+        }
+        
+        // Initialize the matrix with localStorage
+        let matrixManager = new DraggableEisenhowerMatrix();
+        
+        // Global function for adding tasks from the form
+        function addTask() {
+            const title = document.getElementById('taskTitle').value.trim();
+            const description = document.getElementById('taskDescription').value.trim();
+            const quadrant = document.getElementById('taskQuadrant').value;
+            
+            if (!title) {
+                alert('Please enter a task title');
+                return;
+            }
+            
+            matrixManager.addTask(title, description, quadrant);
+            
+            // Clear form
+            document.getElementById('taskTitle').value = '';
+            document.getElementById('taskDescription').value = '';
+        }
+        
+        // Example of switching storage adapters
+        function switchToRestApi() {
+            const restAdapter = new RestApiAdapter('https://api.example.com', 'your-api-key');
+            matrixManager = new DraggableEisenhowerMatrix(restAdapter);
+        }
+        
+        // Example of switching back to localStorage
+        function switchToLocalStorage() {
+            const localAdapter = new LocalStorageAdapter('my-custom-key');
+            matrixManager = new DraggableEisenhowerMatrix(localAdapter);
+        }
+    </script>
+</body>
+</html>

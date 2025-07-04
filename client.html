@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eisenhower Matrix Client</title>
+</head>
+<body>
+    <div id="main"></div>
+    
+    <script type="module">
+        import { DraggableMatrix, QuadrantType } from './dist/index.js';
+        
+        // Initialize the matrix
+        const matrix = new DraggableMatrix('main');
+        
+        // Example of how to add tasks programmatically
+        setTimeout(() => {
+            matrix.addTask('Learn TypeScript', 'Study TypeScript fundamentals', QuadrantType.NOT_URGENT_IMPORTANT);
+            matrix.addTask('Fix urgent bug', 'Critical issue in production', QuadrantType.URGENT_IMPORTANT);
+        }, 2000);
+        
+        // Example of how to remove tasks (uncomment to test)
+        // setTimeout(() => {
+        //     const tasks = matrix.getTasks();
+        //     if (tasks.length > 0) {
+        //         matrix.removeTask(tasks[0].id);
+        //     }
+        // }, 5000);
+    </script>
+</body>
+</html>
