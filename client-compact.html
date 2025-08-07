@@ -21,10 +21,35 @@
             titleSize: '1.2em'
         };
         
-        const matrix = new DraggableMatrix('main', undefined, compactSize);
+        // Custom labels for quadrants - demonstrating partial customization
+        const customLabels = {
+            [QuadrantType.URGENT_IMPORTANT]: {
+                name: 'Fire Drill',
+                description: 'Crisis Mode',
+                actionStrategy: 'Drop everything and fix this now!'
+            },
+            [QuadrantType.NOT_URGENT_IMPORTANT]: {
+                name: 'Growth Zone',
+                actionStrategy: 'Invest time here for long-term success'
+            }
+        };
+        
+        const matrix = new DraggableMatrix('main', undefined, compactSize, customLabels);
         
         // Add some smaller, concise tasks for compact view
         setTimeout(() => {
+            matrix.addTask('Bug fix', 'Critical error', QuadrantType.URGENT_IMPORTANT);
+            matrix.addTask('Learning', 'Study new tech', QuadrantType.NOT_URGENT_IMPORTANT);
+            matrix.addTask('Email', 'Reply to messages', QuadrantType.URGENT_NOT_IMPORTANT);
+            matrix.addTask('Social', 'Check feeds', QuadrantType.NOT_URGENT_NOT_IMPORTANT);
+            matrix.addTask('Bug fix', 'Critical error', QuadrantType.URGENT_IMPORTANT);
+            matrix.addTask('Learning', 'Study new tech', QuadrantType.NOT_URGENT_IMPORTANT);
+            matrix.addTask('Email', 'Reply to messages', QuadrantType.URGENT_NOT_IMPORTANT);
+            matrix.addTask('Social', 'Check feeds', QuadrantType.NOT_URGENT_NOT_IMPORTANT);
+            matrix.addTask('Bug fix', 'Critical error', QuadrantType.URGENT_IMPORTANT);
+            matrix.addTask('Learning', 'Study new tech', QuadrantType.NOT_URGENT_IMPORTANT);
+            matrix.addTask('Email', 'Reply to messages', QuadrantType.URGENT_NOT_IMPORTANT);
+            matrix.addTask('Social', 'Check feeds', QuadrantType.NOT_URGENT_NOT_IMPORTANT);
             matrix.addTask('Bug fix', 'Critical error', QuadrantType.URGENT_IMPORTANT);
             matrix.addTask('Learning', 'Study new tech', QuadrantType.NOT_URGENT_IMPORTANT);
             matrix.addTask('Email', 'Reply to messages', QuadrantType.URGENT_NOT_IMPORTANT);

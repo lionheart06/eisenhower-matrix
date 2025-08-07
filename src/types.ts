@@ -21,3 +21,10 @@ export interface QuadrantInfo {
   description: string;
   actionStrategy: string;
 }
+
+export interface CustomQuadrantLabels {
+  [QuadrantType.URGENT_IMPORTANT]?: Partial<Omit<QuadrantInfo, 'type'>>;
+  [QuadrantType.NOT_URGENT_IMPORTANT]?: Partial<Omit<QuadrantInfo, 'type'>>;
+  [QuadrantType.URGENT_NOT_IMPORTANT]?: Partial<Omit<QuadrantInfo, 'type'>>;
+  [QuadrantType.NOT_URGENT_NOT_IMPORTANT]?: Partial<Omit<QuadrantInfo, 'type'>>;
+}

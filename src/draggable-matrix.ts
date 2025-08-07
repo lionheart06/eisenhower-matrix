@@ -1,5 +1,5 @@
 import { EisenhowerMatrix } from './eisenhower-matrix';
-import { QuadrantType } from './types';
+import { QuadrantType, CustomQuadrantLabels } from './types';
 
 export interface StorageAdapter {
   save(data: any): Promise<void>;
@@ -39,8 +39,8 @@ export class DraggableMatrix {
   private container: HTMLElement;
   private size: MatrixSize;
 
-  constructor(containerId: string, storageAdapter: StorageAdapter = new LocalStorageAdapter(), size: MatrixSize = {}) {
-    this.matrix = new EisenhowerMatrix();
+  constructor(containerId: string, storageAdapter: StorageAdapter = new LocalStorageAdapter(), size: MatrixSize = {}, customLabels?: CustomQuadrantLabels) {
+    this.matrix = new EisenhowerMatrix(customLabels);
     this.storageAdapter = storageAdapter;
     this.size = {
       width: '1200px',
@@ -97,17 +97,21 @@ export class DraggableMatrix {
         background: white;
         border: 2px solid #ddd;
         border-radius: 8px;
-        overflow: hidden;
+        overflow: visible;
         position: relative;
         height: ${this.size.height};
       }
       
       .eisenhower-quadrant {
         min-height: ${this.size.quadrantMinHeight};
+        max-height: 600px;
         padding: ${this.size.padding};
         border: 1px solid #e0e0e0;
         position: relative;
         background: #fafafa;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
       }
       
       .eisenhower-quadrant.drag-over {
@@ -128,6 +132,12 @@ export class DraggableMatrix {
         color: #666;
         margin-bottom: 15px;
         font-style: italic;
+      }
+      
+      .eisenhower-tasks-container {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
       }
       
       .eisenhower-quadrant.urgent-important {
@@ -212,6 +222,8 @@ export class DraggableMatrix {
   }
 
   private createHTML(): void {
+    const quadrants = this.matrix.getAllQuadrantInfo();
+    
     this.container.innerHTML = `
       <div class="eisenhower-container">
         <h1 class="eisenhower-title">Eisenhower Matrix</h1>
@@ -222,26 +234,26 @@ export class DraggableMatrix {
           </div>
           
           <div class="eisenhower-quadrant urgent-important" data-quadrant="urgent_important">
-            <div class="eisenhower-quadrant-header">Do First</div>
-            <div class="eisenhower-quadrant-strategy">Do these tasks immediately</div>
+            <div class="eisenhower-quadrant-header">${quadrants[QuadrantType.URGENT_IMPORTANT].name}</div>
+            <div class="eisenhower-quadrant-strategy">${quadrants[QuadrantType.URGENT_IMPORTANT].actionStrategy}</div>
             <div class="eisenhower-tasks-container"></div>
           </div>
           
           <div class="eisenhower-quadrant not-urgent-important" data-quadrant="not_urgent_important">
-            <div class="eisenhower-quadrant-header">Schedule</div>
-            <div class="eisenhower-quadrant-strategy">Schedule these tasks for later</div>
+            <div class="eisenhower-quadrant-header">${quadrants[QuadrantType.NOT_URGENT_IMPORTANT].name}</div>
+            <div class="eisenhower-quadrant-strategy">${quadrants[QuadrantType.NOT_URGENT_IMPORTANT].actionStrategy}</div>
             <div class="eisenhower-tasks-container"></div>
           </div>
           
           <div class="eisenhower-quadrant urgent-not-important" data-quadrant="urgent_not_important">
-            <div class="eisenhower-quadrant-header">Delegate</div>
-            <div class="eisenhower-quadrant-strategy">Delegate these tasks if possible</div>
+            <div class="eisenhower-quadrant-header">${quadrants[QuadrantType.URGENT_NOT_IMPORTANT].name}</div>
+            <div class="eisenhower-quadrant-strategy">${quadrants[QuadrantType.URGENT_NOT_IMPORTANT].actionStrategy}</div>
             <div class="eisenhower-tasks-container"></div>
           </div>
           
           <div class="eisenhower-quadrant not-urgent-not-important" data-quadrant="not_urgent_not_important">
-            <div class="eisenhower-quadrant-header">Eliminate</div>
-            <div class="eisenhower-quadrant-strategy">Eliminate these tasks</div>
+            <div class="eisenhower-quadrant-header">${quadrants[QuadrantType.NOT_URGENT_NOT_IMPORTANT].name}</div>
+            <div class="eisenhower-quadrant-strategy">${quadrants[QuadrantType.NOT_URGENT_NOT_IMPORTANT].actionStrategy}</div>
             <div class="eisenhower-tasks-container"></div>
           </div>
         </div>

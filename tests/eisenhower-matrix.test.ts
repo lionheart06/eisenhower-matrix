@@ -1,4 +1,4 @@
-import { EisenhowerMatrix, QuadrantType } from '../src';
+import { EisenhowerMatrix, QuadrantType, CustomQuadrantLabels } from '../src';
 
 describe('EisenhowerMatrix', () => {
   let matrix: EisenhowerMatrix;
@@ -96,6 +96,76 @@ describe('EisenhowerMatrix', () => {
     it('should return false for non-existent task', () => {
       const removed = matrix.removeTask('non-existent');
       expect(removed).toBe(false);
+    });
+  });
+
+  describe('Custom Quadrant Labels', () => {
+    it('should use default labels when no custom labels provided', () => {
+      const matrix = new EisenhowerMatrix();
+      const quadrantInfo = matrix.getQuadrantInfo(QuadrantType.URGENT_IMPORTANT);
+      
+      expect(quadrantInfo.name).toBe('Do First');
+      expect(quadrantInfo.description).toBe('Urgent and Important');
+      expect(quadrantInfo.actionStrategy).toBe('Do these tasks immediately');
+    });
+
+    it('should apply custom labels when provided', () => {
+      const customLabels: CustomQuadrantLabels = {
+        [QuadrantType.URGENT_IMPORTANT]: {
+          name: 'Crisis Mode',
+          description: 'Fire Fighting',
+          actionStrategy: 'Put out the fires immediately'
+        },
+        [QuadrantType.NOT_URGENT_IMPORTANT]: {
+          name: 'Plan Ahead',
+          actionStrategy: 'Schedule these for optimal timing'
+        }
+      };
+
+      const matrix = new EisenhowerMatrix(customLabels);
+      
+      const urgentImportant = matrix.getQuadrantInfo(QuadrantType.URGENT_IMPORTANT);
+      expect(urgentImportant.name).toBe('Crisis Mode');
+      expect(urgentImportant.description).toBe('Fire Fighting');
+      expect(urgentImportant.actionStrategy).toBe('Put out the fires immediately');
+
+      const notUrgentImportant = matrix.getQuadrantInfo(QuadrantType.NOT_URGENT_IMPORTANT);
+      expect(notUrgentImportant.name).toBe('Plan Ahead');
+      expect(notUrgentImportant.description).toBe('Important but Not Urgent');
+      expect(notUrgentImportant.actionStrategy).toBe('Schedule these for optimal timing');
+
+      const urgentNotImportant = matrix.getQuadrantInfo(QuadrantType.URGENT_NOT_IMPORTANT);
+      expect(urgentNotImportant.name).toBe('Delegate');
+    });
+
+    it('should merge partial custom labels with defaults', () => {
+      const customLabels: CustomQuadrantLabels = {
+        [QuadrantType.URGENT_IMPORTANT]: {
+          name: 'Fire Drill'
+        }
+      };
+
+      const matrix = new EisenhowerMatrix(customLabels);
+      const quadrantInfo = matrix.getQuadrantInfo(QuadrantType.URGENT_IMPORTANT);
+      
+      expect(quadrantInfo.name).toBe('Fire Drill');
+      expect(quadrantInfo.description).toBe('Urgent and Important');
+      expect(quadrantInfo.actionStrategy).toBe('Do these tasks immediately');
+    });
+
+    it('should return all quadrant info with custom labels', () => {
+      const customLabels: CustomQuadrantLabels = {
+        [QuadrantType.URGENT_IMPORTANT]: { name: 'Custom Do First' },
+        [QuadrantType.NOT_URGENT_IMPORTANT]: { name: 'Custom Schedule' }
+      };
+
+      const matrix = new EisenhowerMatrix(customLabels);
+      const allQuadrants = matrix.getAllQuadrantInfo();
+      
+      expect(allQuadrants[QuadrantType.URGENT_IMPORTANT].name).toBe('Custom Do First');
+      expect(allQuadrants[QuadrantType.NOT_URGENT_IMPORTANT].name).toBe('Custom Schedule');
+      expect(allQuadrants[QuadrantType.URGENT_NOT_IMPORTANT].name).toBe('Delegate');
+      expect(allQuadrants[QuadrantType.NOT_URGENT_NOT_IMPORTANT].name).toBe('Eliminate');
     });
   });
 });

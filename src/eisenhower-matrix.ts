@@ -1,9 +1,10 @@
-import { Task, QuadrantType, QuadrantInfo } from './types';
+import { Task, QuadrantType, QuadrantInfo, CustomQuadrantLabels } from './types';
 
 export class EisenhowerMatrix {
   private tasks: Map<string, Task> = new Map();
+  private quadrantLabels: Record<QuadrantType, QuadrantInfo>;
 
-  static readonly QUADRANTS: Record<QuadrantType, QuadrantInfo> = {
+  static readonly DEFAULT_QUADRANTS: Record<QuadrantType, QuadrantInfo> = {
     [QuadrantType.URGENT_IMPORTANT]: {
       type: QuadrantType.URGENT_IMPORTANT,
       name: 'Do First',
@@ -29,6 +30,10 @@ export class EisenhowerMatrix {
       actionStrategy: 'Eliminate these tasks'
     }
   };
+
+  constructor(customLabels?: CustomQuadrantLabels) {
+    this.quadrantLabels = this.mergeQuadrantLabels(customLabels);
+  }
 
   addTask(title: string, description: string, quadrant: QuadrantType, id?: string): Task {
     const taskId = id || this.generateId();
@@ -111,5 +116,38 @@ export class EisenhowerMatrix {
 
   private generateId(): string {
     return Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+  }
+
+  private mergeQuadrantLabels(customLabels?: CustomQuadrantLabels): Record<QuadrantType, QuadrantInfo> {
+    if (!customLabels) {
+      return { ...EisenhowerMatrix.DEFAULT_QUADRANTS };
+    }
+
+    const merged = { ...EisenhowerMatrix.DEFAULT_QUADRANTS };
+    
+    Object.entries(customLabels).forEach(([quadrantType, customInfo]) => {
+      const type = quadrantType as QuadrantType;
+      if (customInfo) {
+        merged[type] = {
+          ...merged[type],
+          ...customInfo,
+          type: type
+        };
+      }
+    });
+
+    return merged;
+  }
+
+  getQuadrantInfo(quadrant: QuadrantType): QuadrantInfo {
+    return this.quadrantLabels[quadrant];
+  }
+
+  getAllQuadrantInfo(): Record<QuadrantType, QuadrantInfo> {
+    return { ...this.quadrantLabels };
+  }
+
+  static get QUADRANTS(): Record<QuadrantType, QuadrantInfo> {
+    return EisenhowerMatrix.DEFAULT_QUADRANTS;
   }
 }
